@@ -4,8 +4,8 @@ import { MessagePayload } from '../types/payload.js';
 import UserService from '../services/UserService.js';
 
 export class JoinHandler extends BaseHandler {
-  constructor(userService: UserService) {
-    super(userService);
+  constructor(private userService: UserService) {
+    super();
   }
 
   handle(socket: WebSocket, message: MessagePayload): void {

@@ -3,7 +3,7 @@ import { MessagePayload } from '../types/payload.js';
 import UserService from '../services/UserService.js';
 
 export abstract class BaseHandler {
-  constructor(protected userService: UserService) {} 
+  constructor() {} 
 
   abstract handle(socket: WebSocket, message: MessagePayload): void;
 };

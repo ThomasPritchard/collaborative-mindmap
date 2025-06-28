@@ -2,15 +2,13 @@ import { FastifyPluginAsync } from "fastify";
 import { messageHandlers } from "../../../../handlers/index.js";
 import { Payload } from "../../../../types/payload.js";
 import { BaseHandler } from "../../../../handlers/BaseHandler.js";
-import UserService from "../../../../services/UserService.js";
 
 const websocketRoute: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
-  const userService = fastify.getDecorator<UserService>('userService');
-
   const handlerInstances = new Map<string, BaseHandler>();
 
-  for (const [type, HandlerClass] of Object.entries(messageHandlers)) {
-    handlerInstances.set(type, new HandlerClass(userService));
+  for (const [type, handlerFactory] of Object.entries(messageHandlers)) {
+    // Call the factory, passing the service container to it
+    handlerInstances.set(type, handlerFactory(fastify.services));
   }
 
   fastify.get('/', { websocket: true }, (socket, _req) => {
