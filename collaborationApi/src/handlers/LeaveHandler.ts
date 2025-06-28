@@ -1,23 +1,23 @@
 import { WebSocket } from 'ws';
 import { BaseHandler } from './BaseHandler.js';
 import { MessagePayload } from '../types/payload.js';
-import UserService from '../services/UserService.js';
 import { UserLeftPayload } from '../types/userLeftPayload.js';
+import StateManagerService from '../services/StateManagerService.js';
 
 export class LeaveHandler extends BaseHandler {
-  constructor(private userService: UserService) {
+  constructor(private stateManager: StateManagerService) {
     super();
   }
 
   handle(socket: WebSocket, message: MessagePayload): void {
-    const { userId } = message as UserLeftPayload;
+    const { userId, roomId } = message as UserLeftPayload;
 
-    if (!userId) {
-      socket.send(JSON.stringify({ error: 'User ID is required' }));
+    if (!userId || !roomId) {
+      socket.send(JSON.stringify({ error: 'User ID and Room ID are required' }));
       return;
     }
 
-    const success = this.userService.leaveRoom(userId);
+    const success = this.stateManager.leaveRoom(roomId, userId);
     socket.send(JSON.stringify({ success }));
   }
 }

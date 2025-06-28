@@ -1,8 +1,8 @@
 import fp from 'fastify-plugin';
-import UserService from '../services/UserService.js';
+import StateManagerService from '../services/StateManagerService.js';
 
 export const services = {
-  userService: new UserService(),
+  stateManagerService: new StateManagerService(),
   // Add other services here
 };
 
