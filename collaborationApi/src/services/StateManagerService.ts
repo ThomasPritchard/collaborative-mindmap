@@ -1,58 +1,97 @@
-import { State } from "../types/state.js";
+import { State, Room, User, MindMapNode } from "../types/state.js"; // Make sure path is correct
 
 class StateManagerService {
   private state: State = {
-    rooms: [],
+    rooms: new Map<string, Room>(),
   };
 
-  public joinRoom(roomId: string, userId: string, userName: string): void {
-    const room = this.state.rooms.find((r) => r.roomId === roomId);
-    if (room) {
-      // Check if user already exists in the room
-      if (!room.users.some((user) => user.userId === userId)) {
-        room.users.push({ userId, userName, roomId });
-      }
-    } else {
-      // Create a new room if it doesn't exist
-      this.state.rooms.push({
+  /**
+   * Gets a room by its ID.
+   */
+  public getRoom(roomId: string): Room | undefined {
+    return this.state.rooms.get(roomId);
+  }
+
+  /**
+   * Adds a user to a room. If the room doesn't exist, it's created first.
+   */
+  public joinRoom(roomId: string, userId: string, userName: string): Room {
+    // Get the room or create it if it doesn't exist.
+    let room = this.state.rooms.get(roomId);
+
+    if (!room) {
+      room = {
         createdAt: new Date(),
         roomId,
-        users: [{ userId, userName, roomId }],
-      });
+        users: new Map<string, User>(),
+        mindMap: {
+          nodes: new Map<string, MindMapNode>(),
+        },
+      };
+      this.state.rooms.set(roomId, room);
     }
+
+    // Add or update the user in the room's user map.
+    const user: User = { userId, userName };
+    room.users.set(userId, user);
+    
+    return room;
   }
 
-  public leaveRoom(roomId: string, userId: string): boolean {
-    const room = this.state.rooms.find((r) => r.roomId === roomId);
+  /**
+   * Removes a user from a room and cleans up the room if it becomes empty.
+   */
+  public leaveRoom(roomId: string, userId: string): void {
+    const room = this.state.rooms.get(roomId);
+
     if (room) {
-      const userIndex = room.users.findIndex((user) => user.userId === userId);
-      if (userIndex !== -1) {
-        room.users.splice(userIndex, 1);
-        // If no users left, remove the room
-        if (room.users.length === 0) {
-          this.state.rooms = this.state.rooms.filter((r) => r.roomId !== roomId);
-        }
-        return true;
+      room.users.delete(userId);
+
+      // If the room is now empty, remove it from the state.
+      if (room.users.size === 0) {
+        this.state.rooms.delete(roomId);
       }
     }
-    return false;
   }
 
-  public listUsersInRoom(roomId: string): Array<{ userId: string; userName: string }> {
-    const room = this.state.rooms.find((r) => r.roomId === roomId);
+  /**
+   * Adds or updates a node in a specific room's mind map.
+   */
+  public setNode(roomId: string, node: MindMapNode): void {
+    const room = this.state.rooms.get(roomId);
     if (room) {
-      return room.users.map((user) => ({
-        userId: user.userId,
-        userName: user.userName,
-      }));
+      room.mindMap.nodes.set(node.id, node);
     }
+  }
+
+  /**
+   * Deletes a node from a specific room's mind map.
+   */
+  public deleteNode(roomId: string, nodeId: string): void {
+    const room = this.state.rooms.get(roomId);
+    if (room) {
+      room.mindMap.nodes.delete(nodeId);
+    }
+  }
+
+  public listUsersInRoom(roomId: string): User[] {
+    // Get the room directly by its ID.
+    const room = this.state.rooms.get(roomId);
+
+    if (room) {
+      // room.users is a Map. Get its values and convert the iterator to an array.
+      return Array.from(room.users.values());
+    }
+    
+    // If the room doesn't exist, return an empty array.
     return [];
   }
 
+  /**
+   * Clears all rooms and resets the state.
+   */
   public clearState(): void {
-    this.state = {
-      rooms: [],
-    };
+    this.state.rooms.clear();
   }
 }
 
