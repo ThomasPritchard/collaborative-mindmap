@@ -17,6 +17,16 @@ class UserService {
     return roomId;
   }
 
+  public leaveRoom(userId: string): boolean {
+    if (this.users.has(userId)) {
+      const user = this.users.get(userId)!
+      console.log(`User ${user.userName} with ID ${userId} left room ${user.roomId}`)
+      this.users.delete(userId)
+      return true
+    }
+    return false
+  }
+
   public listUsersInRoom(roomId: string): Array<{ userId: string; userName: string }> {
     // Logic to list users in a specific room
     const usersInRoom: Array<{ userId: string; userName: string }> = [];
