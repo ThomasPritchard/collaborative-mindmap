@@ -2,11 +2,12 @@ import { test } from 'node:test'
 import * as assert from 'node:assert'
 import { build } from '../helper.js'
 
-test('default root route', async (t) => {
+test('list users returns array', async (t) => {
   const app = await build(t)
 
   const res = await app.inject({
-    url: '/'
+    url: '/api/v1/listUsers?roomId=defaultRoom'
   })
-  assert.deepStrictEqual(JSON.parse(res.payload), { message: 'Welcome to the Collaboration API!' })
+  const payload = JSON.parse(res.payload)
+  assert.ok(Array.isArray(payload.users))
 })
