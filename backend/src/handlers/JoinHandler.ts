@@ -1,8 +1,8 @@
-import { WebSocket } from 'ws'; // Explicitly import WebSocket from 'ws'
+import { WebSocket } from "ws"; // Explicitly import WebSocket from 'ws'
 import { BaseHandler } from "./BaseHandler.js";
-import { MessagePayload } from '../types/payload.js';
-import { UserJoinPayload } from '../types/userJoinPayload.js';
-import StateManagerService from '../services/StateManagerService.js';
+import { MessagePayload } from "../types/payload.js";
+import { UserJoinPayload } from "../types/userJoinPayload.js";
+import StateManagerService from "../services/StateManagerService.js";
 
 export class JoinHandler extends BaseHandler {
   constructor(private stateManager: StateManagerService) {
@@ -13,13 +13,24 @@ export class JoinHandler extends BaseHandler {
     const { roomId, userId, userName } = message as UserJoinPayload;
 
     if (!userId || !roomId) {
-      socket.send(JSON.stringify({ error: 'Room ID and User ID are required' }));
+      socket.send(
+        JSON.stringify({ error: "Room ID and User ID are required" }),
+      );
       return;
     }
 
     // Here you would typically add the user to the room in your application logic
     const assignedRoomId = this.stateManager.joinRoom(roomId, userId, userName);
 
-    socket.send(JSON.stringify({ success: true, message: `User ${userId} joined room ${assignedRoomId}` }));
+    // Attach room information to the socket for later broadcasts
+    (socket as any).roomId = assignedRoomId;
+    (socket as any).userId = userId;
+
+    socket.send(
+      JSON.stringify({
+        success: true,
+        message: `User ${userId} joined room ${assignedRoomId}`,
+      }),
+    );
   }
 }
