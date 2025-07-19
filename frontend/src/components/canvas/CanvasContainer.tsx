@@ -25,12 +25,20 @@ export default function CanvasContainer() {
   const [currentSelectNode, setCurrentSelectNode] = useState<string | null>(null);
 
   useEffect(() => {
-    // This code only runs in the browser, after the component has mounted.
-    setStageSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  }, []); // The empty array ensures this effect runs only once.
+    const updateSize = () => {
+      setStageSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+
+    return () => {
+      window.removeEventListener('resize', updateSize);
+    };
+  }, []);
 
   const handleAddNode = () => {
     setNodes((prevNodes) => [
