@@ -29,8 +29,7 @@ The backend is a high-performance **Fastify** server that acts as the central hu
 
 ## Tailwind CSS Build Process
 
-The frontend uses Tailwind CSS for styling. PostCSS runs with the `tailwindcss`
-and `autoprefixer` plugins as defined in `frontend/postcss.config.mjs`. Running
+The frontend uses Tailwind CSS for styling. PostCSS runs with the `tailwindcss`. Running
 `npm run dev` or `npm run build` inside the `frontend` directory triggers this
 pipeline, generating the final CSS. Tailwind scans the files listed in
 `frontend/tailwind.config.ts` to purge unused classes and apply any theme
