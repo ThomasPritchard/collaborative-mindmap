@@ -24,3 +24,15 @@ You can also start the entire stack with Docker Compose from the project root:
 ```bash
 docker-compose up
 ```
+
+## Environment Variables
+
+The frontend expects the following environment variables to be available when running or building the app:
+
+- `NEXT_PUBLIC_BACKEND_URL` – URL of the backend Fastify server used for WebSocket communication.
+
+Create a `.env.local` file at the project root and define the variable there:
+
+```bash
+NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+```
