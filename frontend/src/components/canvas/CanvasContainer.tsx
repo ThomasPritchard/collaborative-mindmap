@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Stage, Layer, Rect, Group, Text } from 'react-konva';
 import Toolbar from './Toolbar';
+import { v4 as uuidv4 } from 'uuid';
 
 type Node = {
   id: string;
@@ -22,6 +23,7 @@ export default function CanvasContainer() {
     height: 0,
   });
   const [nodes, setNodes] = useState<Node[]>([]);
+  const [nodeCounter, setNodeCounter] = useState(1);
   const [currentSelectNode, setCurrentSelectNode] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,16 +43,21 @@ export default function CanvasContainer() {
   }, []);
 
   const handleAddNode = () => {
-    setNodes((prevNodes) => [
-      ...prevNodes,
-      {
-        id: `node-${prevNodes.length + 1}`,
-        text: `Node ${prevNodes.length + 1}`,
-        position: { x: Math.random() * stageSize.width, y: Math.random() * stageSize.height },
-        color: '#ffcc00',
+  setNodes((prevNodes) => [
+    ...prevNodes,
+    {
+      id: uuidv4(),
+      text: `Node ${nodeCounter}`,
+      position: {
+        x: Math.random() * stageSize.width,
+        y: Math.random() * stageSize.height
       },
-    ]);
-  };
+      color: '#ffcc00',
+    },
+  ]);
+  setNodeCounter((prev) => prev + 1);
+};
+
 
   const handleRemoveNode = () => {
     if (!currentSelectNode) return;
